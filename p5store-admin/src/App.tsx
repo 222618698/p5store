@@ -11,6 +11,7 @@ import OrderLookupPage from '@/features/orders/OrderLookupPage';
 import CustomersPage from '@/features/customers/CustomersPage';
 import SalesReportsPage from '@/features/reports/SalesReportsPage';
 import PromoCodesPage from '@/features/discounts/PromoCodesPage';
+import ContactMessagesPage from '@/features/messages/ContactMessagesPage';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -39,6 +40,7 @@ export default function App() {
                 <Route path="/customers" element={<CustomersPage />} />
                 <Route path="/reports" element={<SalesReportsPage />} />
                 <Route path="/promo-codes" element={<PromoCodesPage />} />
+                <Route path="/messages" element={<ContactMessagesPage />} />
               </Route>
             </Route>
           </Routes>

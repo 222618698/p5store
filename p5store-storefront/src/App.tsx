@@ -17,6 +17,9 @@ import AccountSettingsPage from '@/features/account/AccountSettingsPage';
 import ComingSoonPage from '@/features/account/ComingSoonPage';
 import CheckoutPage from '@/features/checkout/CheckoutPage';
 import OrderConfirmationPage from '@/features/checkout/OrderConfirmationPage';
+import AboutPage from '@/features/company/AboutPage';
+import PrivacyPolicyPage from '@/features/company/PrivacyPolicyPage';
+import ContactPage from '@/features/company/ContactPage';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -43,6 +46,9 @@ export default function App() {
             <Route path="/products/:id" element={<ProductDetailPage />} />
             <Route path="/checkout" element={<CheckoutPage />} />
             <Route path="/order-confirmation/:orderNumber" element={<OrderConfirmationPage />} />
+            <Route path="/about" element={<AboutPage />} />
+            <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
+            <Route path="/contact" element={<ContactPage />} />
 
             <Route path="/account" element={<AccountLayout />}>
               <Route index element={<AccountDashboardPage />} />

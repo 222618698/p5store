@@ -9,6 +9,7 @@ const navItems = [
   { to: '/customers', label: 'Customers', icon: CustomersIcon },
   { to: '/reports', label: 'Sales Reports', icon: ReportsIcon },
   { to: '/promo-codes', label: 'Promo Codes', icon: PromoIcon },
+  { to: '/messages', label: 'Messages', icon: MessagesIcon },
 ];
 
 export default function Sidebar() {
@@ -106,6 +107,15 @@ function PromoIcon(props: React.SVGProps<SVGSVGElement>) {
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" {...props}>
       <path d="m20.59 13.41-7.17 7.17a2 2 0 0 1-2.83 0L3 13V3h10l7.59 7.59a2 2 0 0 1 0 2.82Z" />
       <circle cx="7.5" cy="7.5" r="1.5" fill="currentColor" stroke="none" />
+    </svg>
+  );
+}
+
+function MessagesIcon(props: React.SVGProps<SVGSVGElement>) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" {...props}>
+      <rect x="2.5" y="4.5" width="19" height="15" rx="2" />
+      <path d="m3 6 9 7 9-7" />
     </svg>
   );
 }

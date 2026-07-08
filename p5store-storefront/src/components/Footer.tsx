@@ -1,7 +1,13 @@
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 
 const SHOP_LINKS = ['New Arrivals', 'Best Sellers', 'Collections', 'Gift Cards'];
-const COMPANY_LINKS = ['About Us', 'Sustainability', 'Privacy Policy', 'Contact'];
+const COMPANY_LINKS: { label: string; to?: string }[] = [
+  { label: 'About Us', to: '/about' },
+  { label: 'Sustainability' },
+  { label: 'Privacy Policy', to: '/privacy-policy' },
+  { label: 'Contact', to: '/contact' },
+];
 
 export default function Footer() {
   const [email, setEmail] = useState('');
@@ -27,7 +33,7 @@ export default function Footer() {
           </p>
         </div>
 
-        <FooterColumn title="Shop" links={SHOP_LINKS} />
+        <FooterColumn title="Shop" links={SHOP_LINKS.map((label) => ({ label }))} />
         <FooterColumn title="Company" links={COMPANY_LINKS} />
 
         <div>
@@ -65,16 +71,28 @@ export default function Footer() {
   );
 }
 
-function FooterColumn({ title, links }: { title: string; links: string[] }) {
+function FooterColumn({
+  title,
+  links,
+}: {
+  title: string;
+  links: { label: string; to?: string }[];
+}) {
   return (
     <div>
       <p className="mb-3 text-sm font-semibold text-navy-900">{title}</p>
       <ul className="space-y-2 text-sm text-navy-700/70">
-        {links.map((label) => (
+        {links.map(({ label, to }) => (
           <li key={label}>
-            <a href="#" className="hover:text-navy-900">
-              {label}
-            </a>
+            {to ? (
+              <Link to={to} className="hover:text-navy-900">
+                {label}
+              </Link>
+            ) : (
+              <a href="#" className="hover:text-navy-900">
+                {label}
+              </a>
+            )}
           </li>
         ))}
       </ul>

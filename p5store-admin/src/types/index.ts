@@ -126,3 +126,13 @@ export interface DiscountRequest {
   validTo?: string | null;
   active?: boolean;
 }
+
+export interface ContactMessageResponse {
+  id: number;
+  fullName: string;
+  email: string;
+  phone: string | null;
+  company: string | null;
+  message: string;
+  createdAt: string;
+}

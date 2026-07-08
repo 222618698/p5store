@@ -168,6 +168,24 @@ export interface ChangePasswordRequest {
   newPassword: string;
 }
 
+export interface ContactMessageRequest {
+  fullName: string;
+  email: string;
+  phone?: string;
+  company?: string;
+  message: string;
+}
+
+export interface ContactMessageResponse {
+  id: number;
+  fullName: string;
+  email: string;
+  phone: string | null;
+  company: string | null;
+  message: string;
+  createdAt: string;
+}
+
 export type AddressType = 'SHIPPING' | 'BILLING';
 
 export interface AddressResponse {
