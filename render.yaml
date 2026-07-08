@@ -1,0 +1,28 @@
+services:
+  - type: web
+    name: p5store-storefront
+    runtime: static
+    rootDir: p5store-storefront
+    buildCommand: npm install && npm run build
+    staticPublishPath: dist
+    envVars:
+      - key: VITE_API_URL
+        value: https://p5store-backend.onrender.com/store
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
+
+  - type: web
+    name: p5store-admin
+    runtime: static
+    rootDir: p5store-admin
+    buildCommand: npm install && npm run build
+    staticPublishPath: dist
+    envVars:
+      - key: VITE_API_URL
+        value: https://p5store-backend.onrender.com/store
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
