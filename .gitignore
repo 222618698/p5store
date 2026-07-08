@@ -1,0 +1,12 @@
+# Portable dev tools (not part of the project source)
+/jdk21/
+/maven/
+
+# Editor/OS
+.vscode/
+.idea/
+.DS_Store
+
+# Local tool/machine state
+.claude/settings.local.json
+.env

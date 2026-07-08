@@ -1,0 +1,70 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@400;500;600;700&display=swap');
+@import "tailwindcss";
+
+@theme {
+  /* Pillar 5 Group brand identity */
+  --color-navy-950: #0e2038;
+  --color-navy-900: #14294a;
+  --color-navy-800: #1b3a6b;
+  --color-navy-700: #234a86;
+  --color-navy-600: #2d5aa0;
+  --color-navy-100: #e7ecf4;
+  --color-navy-50: #f4f6fa;
+
+  --color-gold-600: #ab8a37;
+  --color-gold-500: #c9a84c;
+  --color-gold-400: #d6bc70;
+  --color-gold-100: #f6efd9;
+
+  --color-status-success: #1f8a4c;
+  --color-status-warning: #b8860b;
+  --color-status-danger: #b3261e;
+  --color-status-info: #2d5aa0;
+
+  --font-display: 'DM Serif Display', serif;
+  --font-sans: 'DM Sans', ui-sans-serif, system-ui, sans-serif;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-sans);
+  background-color: var(--color-navy-50);
+  color: var(--color-navy-950);
+}
+
+.font-display {
+  font-family: var(--font-display);
+}
+
+/* Browsers force their own visited-link color regardless of author
+   specificity; pin it back to inherit so our text-* utilities always win. */
+a:visited {
+  color: inherit;
+}
+
+/* Chrome/Edge paint autofilled inputs with a yellow/blue tint via an internal
+   UA style that background-color can't override directly. */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus {
+  -webkit-text-fill-color: var(--color-navy-950);
+  -webkit-box-shadow: 0 0 0px 1000px white inset;
+  box-shadow: 0 0 0px 1000px white inset;
+  transition: background-color 5000s ease-in-out 0s;
+}
+
+@layer components {
+  .input {
+    width: 100%;
+    border-radius: 0.25rem;
+    border: 1px solid var(--color-navy-100);
+    padding: 0.5rem 0.75rem;
+    font-size: 0.875rem;
+    outline: none;
+    background-color: white;
+  }
+  .input:focus {
+    border-color: var(--color-navy-600);
+    box-shadow: 0 0 0 1px var(--color-navy-600);
+  }
+}
