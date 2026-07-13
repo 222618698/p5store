@@ -30,3 +30,17 @@ export async function getNewArrivals(): Promise<ProductResponse[]> {
   const { data } = await apiClient.get<ProductResponse[]>('/v1/products/new-arrivals');
   return data;
 }
+
+export async function searchProducts(q: string): Promise<ProductResponse[]> {
+  const { data } = await apiClient.get<ProductResponse[]>('/v1/products/search', {
+    params: { q },
+  });
+  return data;
+}
+
+export async function getProductsByCategory(categoryId: number): Promise<ProductResponse[]> {
+  const { data } = await apiClient.get<ProductResponse[]>(
+    `/v1/products/category/${categoryId}`
+  );
+  return data;
+}

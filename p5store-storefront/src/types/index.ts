@@ -46,6 +46,14 @@ export interface ProductResponse {
   reviewCount: number;
 }
 
+export interface CategoryResponse {
+  id: number;
+  name: string;
+  description: string | null;
+  imageUrl: string | null;
+  parentId: number | null;
+}
+
 export interface ReviewResponse {
   id: number;
   rating: number;

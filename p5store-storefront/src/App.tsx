@@ -9,6 +9,7 @@ import ResetSuccessPage from '@/features/auth/ResetSuccessPage';
 import CartPage from '@/features/cart/CartPage';
 import WishlistPage from '@/features/wishlist/WishlistPage';
 import ProductDetailPage from '@/features/products/ProductDetailPage';
+import ProductListPage from '@/features/products/ProductListPage';
 import AccountLayout from '@/features/account/AccountLayout';
 import AccountDashboardPage from '@/features/account/AccountDashboardPage';
 import AccountOrdersPage from '@/features/account/AccountOrdersPage';
@@ -43,6 +44,7 @@ export default function App() {
             <Route path="/reset-password/success" element={<ResetSuccessPage />} />
             <Route path="/cart" element={<CartPage />} />
             <Route path="/wishlist" element={<WishlistPage />} />
+            <Route path="/products" element={<ProductListPage />} />
             <Route path="/products/:id" element={<ProductDetailPage />} />
             <Route path="/checkout" element={<CheckoutPage />} />
             <Route path="/order-confirmation/:orderNumber" element={<OrderConfirmationPage />} />

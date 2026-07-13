@@ -1,16 +1,19 @@
-import { Link } from 'react-router-dom';
+import { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { useAuth } from '@/context/AuthContext';
 import { getCart } from '@/api/cart';
+import { getCategories } from '@/api/categories';
 import { useWishlist } from '@/lib/wishlist';
 import logo from '@/assets/logo.png';
 
 const NAV_LINKS = ['New Arrivals', 'Best Sellers', 'Designers', 'Brands'];
-const CATEGORY_LINKS = ['Electronics', 'Home & Living', 'Beauty', 'Fashion', 'Sports'];
 
 export default function Header() {
   const { user, isAuthenticated, logout } = useAuth();
   const { items: wishlistItems } = useWishlist();
+  const navigate = useNavigate();
+  const [searchTerm, setSearchTerm] = useState('');
 
   const cartQuery = useQuery({
     queryKey: ['cart', user?.userId],
@@ -18,6 +21,17 @@ export default function Header() {
     enabled: isAuthenticated,
   });
   const cartCount = cartQuery.data?.items.reduce((sum, i) => sum + i.quantity, 0) ?? 0;
+
+  const categoriesQuery = useQuery({
+    queryKey: ['categories'],
+    queryFn: getCategories,
+  });
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    const trimmed = searchTerm.trim();
+    if (trimmed) navigate(`/products?q=${encodeURIComponent(trimmed)}`);
+  };
 
   return (
     <header className="border-b border-navy-100 bg-white">
@@ -35,14 +49,21 @@ export default function Header() {
         </nav>
 
         <div className="ml-auto flex items-center gap-4">
-          <div className="hidden items-center rounded border border-navy-100 px-3 py-1.5 sm:flex">
+          <form
+            onSubmit={handleSearch}
+            className="hidden items-center rounded border border-navy-100 px-3 py-1.5 sm:flex"
+          >
             <input
               type="search"
               placeholder="Search for luxury goods..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
               className="w-48 text-sm outline-none placeholder:text-navy-700/40"
             />
-            <SearchIcon className="h-4 w-4 shrink-0 text-navy-700/50" />
-          </div>
+            <button type="submit" aria-label="Search">
+              <SearchIcon className="h-4 w-4 shrink-0 text-navy-700/50" />
+            </button>
+          </form>
 
           <Link to="/wishlist" className="relative text-navy-800 hover:text-navy-600">
             <HeartIcon className="h-5 w-5" />
@@ -82,11 +103,15 @@ export default function Header() {
       </div>
 
       <div className="border-t border-navy-100">
-        <div className="mx-auto flex max-w-7xl items-center gap-6 px-6 py-2 text-xs font-medium uppercase tracking-wide text-navy-700/70">
-          {CATEGORY_LINKS.map((label) => (
-            <a key={label} href="#" className="hover:text-navy-900">
-              {label}
-            </a>
+        <div className="mx-auto flex max-w-7xl items-center gap-6 overflow-x-auto px-6 py-2 text-xs font-medium uppercase tracking-wide text-navy-700/70">
+          {(categoriesQuery.data ?? []).map((c) => (
+            <Link
+              key={c.id}
+              to={`/products?category=${c.id}`}
+              className="shrink-0 hover:text-navy-900"
+            >
+              {c.name}
+            </Link>
           ))}
         </div>
       </div>
