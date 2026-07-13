@@ -4,7 +4,7 @@ import { useQuery } from '@tanstack/react-query';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import ProductCard from '@/components/ProductCard';
-import { searchProducts, getProductsByCategory, getProducts } from '@/api/products';
+import { searchProducts, getProductsByCategory, getProducts, getNewArrivals } from '@/api/products';
 import { getCategories } from '@/api/categories';
 
 const PAGE_SIZE = 12;
@@ -16,6 +16,7 @@ export default function ProductListPage() {
   const q = searchParams.get('q') ?? '';
   const categoryParam = searchParams.get('category');
   const categoryId = categoryParam ? Number(categoryParam) : null;
+  const isNewArrivals = searchParams.get('filter') === 'new';
 
   const [selectedCategories, setSelectedCategories] = useState<Set<number>>(new Set());
   const [selectedBrands, setSelectedBrands] = useState<Set<string>>(new Set());
@@ -33,7 +34,7 @@ export default function ProductListPage() {
     setMaxPrice('');
     setMinRating(0);
     setPage(0);
-  }, [q, categoryId]);
+  }, [q, categoryId, isNewArrivals]);
 
   const categoriesQuery = useQuery({
     queryKey: ['categories'],
@@ -41,10 +42,11 @@ export default function ProductListPage() {
   });
 
   const resultsQuery = useQuery({
-    queryKey: ['products', 'list', q, categoryId],
+    queryKey: ['products', 'list', q, categoryId, isNewArrivals],
     queryFn: async () => {
       if (q) return searchProducts(q);
       if (categoryId) return getProductsByCategory(categoryId);
+      if (isNewArrivals) return getNewArrivals();
       const page = await getProducts({ size: 100 });
       return page.content;
     },
@@ -105,7 +107,11 @@ export default function ProductListPage() {
   const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
   const paged = filtered.slice(page * PAGE_SIZE, page * PAGE_SIZE + PAGE_SIZE);
 
-  const heading = q ? `Search results for "${q}"` : categoryFromList(categoriesQuery.data, categoryId);
+  const heading = q
+    ? `Search results for "${q}"`
+    : isNewArrivals
+      ? 'New Arrivals'
+      : categoryFromList(categoriesQuery.data, categoryId);
 
   const toggleCategory = (id: number) => {
     setSelectedCategories((prev) => {

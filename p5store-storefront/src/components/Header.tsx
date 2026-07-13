@@ -7,7 +7,12 @@ import { getCategories } from '@/api/categories';
 import { useWishlist } from '@/lib/wishlist';
 import logo from '@/assets/logo.png';
 
-const NAV_LINKS = ['New Arrivals', 'Best Sellers', 'Designers', 'Brands'];
+const NAV_LINKS: { label: string; to?: string }[] = [
+  { label: 'New Arrivals', to: '/products?filter=new' },
+  { label: 'Best Sellers' },
+  { label: 'Designers' },
+  { label: 'Brands', to: '/products' },
+];
 
 export default function Header() {
   const { user, isAuthenticated, logout } = useAuth();
@@ -41,11 +46,17 @@ export default function Header() {
         </Link>
 
         <nav className="hidden flex-1 items-center gap-6 text-sm font-medium text-navy-800 md:flex">
-          {NAV_LINKS.map((label) => (
-            <a key={label} href="#" className="hover:text-navy-600">
-              {label}
-            </a>
-          ))}
+          {NAV_LINKS.map(({ label, to }) =>
+            to ? (
+              <Link key={label} to={to} className="hover:text-navy-600">
+                {label}
+              </Link>
+            ) : (
+              <a key={label} href="#" className="hover:text-navy-600">
+                {label}
+              </a>
+            )
+          )}
         </nav>
 
         <div className="ml-auto flex items-center gap-4">
