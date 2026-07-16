@@ -1,4 +1,5 @@
 import { useMemo } from 'react';
+import { Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
@@ -37,9 +38,12 @@ export default function HomePage() {
               The latest additions to our curated collections.
             </p>
           </div>
-          <a href="#" className="text-sm font-semibold text-gold-600 hover:underline">
+          <Link
+            to="/products?filter=new"
+            className="text-sm font-semibold text-gold-600 hover:underline"
+          >
             View All →
-          </a>
+          </Link>
         </div>
 
         {newArrivalsQuery.isLoading && (
