@@ -1,36 +1,66 @@
 import { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, useSearchParams, Link } from 'react-router-dom';
+import { useMutation } from '@tanstack/react-query';
 import AuthShell from '@/components/AuthShell';
+import { resetPassword } from '@/api/auth';
 
 export default function ResetPasswordPage() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const token = searchParams.get('token');
+
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [error, setError] = useState<string | null>(null);
-  const [submitting, setSubmitting] = useState(false);
+  const [validationError, setValidationError] = useState<string | null>(null);
+
+  const mutation = useMutation({
+    mutationFn: () => resetPassword({ token: token!, newPassword: password }),
+    onSuccess: () => navigate('/reset-password/success'),
+  });
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    setError(null);
+    setValidationError(null);
 
     if (password.length < 6) {
-      setError('Password must be at least 6 characters.');
+      setValidationError('Password must be at least 6 characters.');
       return;
     }
     if (password !== confirmPassword) {
-      setError("Passwords don't match.");
+      setValidationError("Passwords don't match.");
       return;
     }
 
-    setSubmitting(true);
-    // NOTE: no backend endpoint exists yet for applying a password reset.
-    // Wire this up to a real POST /v1/auth/reset-password (with the token
-    // from the emailed link) once that lands.
-    setTimeout(() => {
-      setSubmitting(false);
-      navigate('/reset-password/success');
-    }, 700);
+    mutation.mutate();
   };
+
+  if (!token) {
+    return (
+      <AuthShell>
+        <h1 className="mb-1 text-center font-display text-xl text-navy-900">
+          Invalid Reset Link
+        </h1>
+        <p className="mb-5 text-center text-sm text-navy-700/70">
+          This password reset link is missing or invalid. Please request a new one.
+        </p>
+        <Link
+          to="/forgot-password"
+          className="block w-full rounded bg-gold-500 py-2.5 text-center text-sm font-semibold uppercase tracking-wide text-navy-950 transition hover:bg-gold-600"
+        >
+          Request New Link
+        </Link>
+        <div className="mt-5 text-center">
+          <Link to="/login" className="text-xs font-medium text-navy-700 hover:underline">
+            Back to Login
+          </Link>
+        </div>
+      </AuthShell>
+    );
+  }
+
+  const error =
+    validationError ??
+    (mutation.isError ? 'This reset link is invalid or has expired. Please request a new one.' : null);
 
   return (
     <AuthShell>
@@ -77,10 +107,10 @@ export default function ResetPasswordPage() {
 
         <button
           type="submit"
-          disabled={submitting}
+          disabled={mutation.isPending}
           className="w-full rounded bg-gold-500 py-2.5 text-sm font-semibold uppercase tracking-wide text-navy-950 transition hover:bg-gold-600 disabled:opacity-60"
         >
-          {submitting ? 'Updating…' : 'Update Password'}
+          {mutation.isPending ? 'Updating…' : 'Update Password'}
         </button>
       </form>
 
