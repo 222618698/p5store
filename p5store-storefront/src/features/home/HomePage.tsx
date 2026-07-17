@@ -103,15 +103,18 @@ function Hero() {
       <div className="mx-auto grid max-w-7xl grid-cols-1 items-center gap-10 lg:grid-cols-2">
         <div>
           <span className="mb-4 inline-block rounded bg-gold-500 px-3 py-1 text-xs font-bold uppercase tracking-wide text-navy-950">
-            Pillar 5 Guide
+            Pillar 5 Store
           </span>
           <h1 className="font-display text-4xl leading-tight sm:text-5xl">
             Above Average <span className="text-gold-400">Excellence</span>
           </h1>
 
-          <button className="mt-6 rounded bg-gold-500 px-6 py-2.5 text-sm font-semibold text-navy-950 transition hover:bg-gold-600">
+          <Link
+            to="/products"
+            className="mt-6 inline-block rounded bg-gold-500 px-6 py-2.5 text-sm font-semibold text-navy-950 transition hover:bg-gold-600"
+          >
             Shop Now →
-          </button>
+          </Link>
         </div>
 
         <div className="rounded-lg border border-navy-800 bg-navy-900/60 p-6">
