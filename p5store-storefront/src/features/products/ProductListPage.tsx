@@ -40,6 +40,23 @@ export default function ProductListPage() {
     queryKey: ['categories'],
     queryFn: getCategories,
   });
+  const topLevelCategories = (categoriesQuery.data ?? []).filter((c) => c.parentId === null);
+
+  // Products are tagged to a subcategory, not the top-level category, so
+  // filtering/counting by top-level needs each product's top-level ancestor,
+  // not its raw (leaf) categoryName.
+  const topLevelNameByCategoryId = useMemo(() => {
+    const map = new Map<number, string>();
+    for (const c of categoriesQuery.data ?? []) {
+      if (c.parentId === null) {
+        map.set(c.id, c.name);
+      } else {
+        const parent = categoriesQuery.data?.find((p) => p.id === c.parentId);
+        if (parent) map.set(c.id, parent.name);
+      }
+    }
+    return map;
+  }, [categoriesQuery.data]);
 
   const resultsQuery = useQuery({
     queryKey: ['products', 'list', q, categoryId, isNewArrivals],
@@ -57,10 +74,11 @@ export default function ProductListPage() {
   const categoryCounts = useMemo(() => {
     const counts = new Map<string, number>();
     for (const p of rawResults) {
-      if (p.categoryName) counts.set(p.categoryName, (counts.get(p.categoryName) ?? 0) + 1);
+      const topName = p.categoryId ? topLevelNameByCategoryId.get(p.categoryId) : null;
+      if (topName) counts.set(topName, (counts.get(topName) ?? 0) + 1);
     }
     return counts;
-  }, [rawResults]);
+  }, [rawResults, topLevelNameByCategoryId]);
 
   const availableBrands = useMemo(() => {
     const brands = new Set<string>();
@@ -76,8 +94,9 @@ export default function ProductListPage() {
     );
 
     let results = rawResults.filter((p) => {
-      if (categoryNames.size > 0 && !(p.categoryName && categoryNames.has(p.categoryName))) {
-        return false;
+      if (categoryNames.size > 0) {
+        const topName = p.categoryId ? topLevelNameByCategoryId.get(p.categoryId) : null;
+        if (!topName || !categoryNames.has(topName)) return false;
       }
       if (selectedBrands.size > 0 && !(p.brand && selectedBrands.has(p.brand))) {
         return false;
@@ -102,7 +121,7 @@ export default function ProductListPage() {
     });
 
     return results;
-  }, [rawResults, selectedCategories, selectedBrands, minPrice, maxPrice, minRating, sortBy, categoriesQuery.data]);
+  }, [rawResults, selectedCategories, selectedBrands, minPrice, maxPrice, minRating, sortBy, categoriesQuery.data, topLevelNameByCategoryId]);
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
   const paged = filtered.slice(page * PAGE_SIZE, page * PAGE_SIZE + PAGE_SIZE);
@@ -154,7 +173,7 @@ export default function ProductListPage() {
                 Category
               </p>
               <div className="space-y-1.5">
-                {(categoriesQuery.data ?? []).map((c) => (
+                {topLevelCategories.map((c) => (
                   <label key={c.id} className="flex items-center gap-2 text-sm text-navy-800">
                     <input
                       type="checkbox"

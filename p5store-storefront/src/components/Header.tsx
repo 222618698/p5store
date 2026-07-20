@@ -31,6 +31,7 @@ export default function Header() {
     queryKey: ['categories'],
     queryFn: getCategories,
   });
+  const topLevelCategories = (categoriesQuery.data ?? []).filter((c) => c.parentId === null);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -115,7 +116,7 @@ export default function Header() {
 
       <div className="border-t border-navy-100">
         <div className="mx-auto flex max-w-7xl items-center gap-6 overflow-x-auto px-6 py-2 text-xs font-medium uppercase tracking-wide text-navy-700/70">
-          {(categoriesQuery.data ?? []).map((c) => (
+          {topLevelCategories.map((c) => (
             <Link
               key={c.id}
               to={`/products?category=${c.id}`}
