@@ -156,6 +156,10 @@ export interface PlaceOrderRequest {
   shippingMethod?: ShippingMethod;
 }
 
+export interface PayPalOrderResponse {
+  approvalUrl: string;
+}
+
 export interface UserResponse {
   id: number;
   firstName: string;

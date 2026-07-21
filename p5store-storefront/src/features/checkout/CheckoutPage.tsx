@@ -6,7 +6,7 @@ import Header from '@/components/Header';
 import { useAuth } from '@/context/AuthContext';
 import { getCart } from '@/api/cart';
 import { getAddresses, createAddress } from '@/api/addresses';
-import { placeOrder } from '@/api/orders';
+import { placeOrder, createPayPalOrder } from '@/api/orders';
 import { validatePromoCode } from '@/api/discounts';
 import { getAppliedCoupon, clearAppliedCoupon } from '@/lib/checkoutCoupon';
 import type { AddressRequest, AddressResponse, ShippingMethod } from '@/types';
@@ -23,6 +23,7 @@ const SHIPPING_OPTIONS: { value: ShippingMethod; label: string; description: str
 ];
 
 const PAYMENT_OPTIONS = [
+  { value: 'PAYPAL', label: 'PayPal' },
   { value: 'CARD', label: 'Credit / Debit Card' },
   { value: 'EFT', label: 'Instant EFT' },
   { value: 'SNAPSCAN', label: 'SnapScan' },
@@ -45,7 +46,7 @@ export default function CheckoutPage() {
   const [step, setStep] = useState(0);
   const [selectedAddressId, setSelectedAddressId] = useState<number | null>(null);
   const [shippingMethod, setShippingMethod] = useState<ShippingMethod>('STANDARD');
-  const [paymentMethod, setPaymentMethod] = useState('CARD');
+  const [paymentMethod, setPaymentMethod] = useState('PAYPAL');
   const [cardName, setCardName] = useState('');
   const [cardNumber, setCardNumber] = useState('');
   const [cardExpiry, setCardExpiry] = useState('');
@@ -86,17 +87,30 @@ export default function CheckoutPage() {
   const selectedAddress = addressesQuery.data?.find((a) => a.id === selectedAddressId) ?? null;
 
   const placeOrderMutation = useMutation({
-    mutationFn: () =>
-      placeOrder(user!.userId, {
+    mutationFn: async () => {
+      const order = await placeOrder(user!.userId, {
         addressId: selectedAddressId!,
         couponCode: couponCode ?? undefined,
         paymentMethod,
         shippingMethod,
-      }),
-    onSuccess: (order) => {
+      });
+      if (paymentMethod === 'PAYPAL') {
+        const { approvalUrl } = await createPayPalOrder(user!.userId, order.id);
+        return { order, approvalUrl };
+      }
+      return { order, approvalUrl: null };
+    },
+    onSuccess: ({ order, approvalUrl }) => {
       clearAppliedCoupon();
       queryClient.invalidateQueries({ queryKey: ['cart', user?.userId] });
       queryClient.invalidateQueries({ queryKey: ['orders', user?.userId] });
+      if (approvalUrl) {
+        // Hand off to PayPal to approve payment; PayPal redirects back to
+        // /paypal/return, which captures the payment and lands on this same
+        // confirmation page.
+        window.location.href = approvalUrl;
+        return;
+      }
       navigate(`/order-confirmation/${order.orderNumber}`);
     },
     onError: (err: unknown) => {
@@ -494,7 +508,7 @@ function PaymentStep({
     <div>
       <h2 className="mb-1 font-display text-xl text-navy-900">Payment Method</h2>
       <p className="mb-4 text-xs text-navy-700/50">
-        Demo checkout — no real payment is processed or stored.
+        PayPal processes a real payment. Other methods are a demo checkout only.
       </p>
 
       <div className="space-y-2">
@@ -626,7 +640,9 @@ function ReviewStep({
           disabled={isPlacing}
           className="flex-1 rounded bg-gold-500 py-2.5 text-sm font-semibold text-navy-950 hover:bg-gold-600 disabled:opacity-60"
         >
-          {isPlacing ? 'Placing Order…' : 'Place Order'}
+          {isPlacing
+            ? (paymentMethod === 'PAYPAL' ? 'Redirecting to PayPal…' : 'Placing Order…')
+            : (paymentMethod === 'PAYPAL' ? 'Pay with PayPal' : 'Place Order')}
         </button>
       </div>
     </div>
