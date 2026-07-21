@@ -44,3 +44,13 @@ export async function getProductsByCategory(categoryId: number): Promise<Product
   );
   return data;
 }
+
+export interface CategoryCount {
+  categoryId: number;
+  count: number;
+}
+
+export async function getCategoryCounts(): Promise<CategoryCount[]> {
+  const { data } = await apiClient.get<CategoryCount[]>('/v1/products/category-counts');
+  return data;
+}

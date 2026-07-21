@@ -4,7 +4,7 @@ import { useQuery } from '@tanstack/react-query';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import ProductCard from '@/components/ProductCard';
-import { searchProducts, getProductsByCategory, getProducts, getNewArrivals } from '@/api/products';
+import { searchProducts, getProductsByCategory, getProducts, getNewArrivals, getCategoryCounts } from '@/api/products';
 import { getCategories } from '@/api/categories';
 
 const PAGE_SIZE = 12;
@@ -71,14 +71,21 @@ export default function ProductListPage() {
 
   const rawResults = resultsQuery.data ?? [];
 
+  // Store-wide counts per top-level category, independent of the current
+  // category filter — computed on the backend across all ~30k products
+  // rather than from `rawResults`, which only contains the already-filtered
+  // page of products and would make every other category look empty.
+  const categoryCountsQuery = useQuery({
+    queryKey: ['products', 'category-counts'],
+    queryFn: getCategoryCounts,
+  });
   const categoryCounts = useMemo(() => {
-    const counts = new Map<string, number>();
-    for (const p of rawResults) {
-      const topName = p.categoryId ? topLevelNameByCategoryId.get(p.categoryId) : null;
-      if (topName) counts.set(topName, (counts.get(topName) ?? 0) + 1);
+    const counts = new Map<number, number>();
+    for (const c of categoryCountsQuery.data ?? []) {
+      counts.set(c.categoryId, c.count);
     }
     return counts;
-  }, [rawResults, topLevelNameByCategoryId]);
+  }, [categoryCountsQuery.data]);
 
   const availableBrands = useMemo(() => {
     const brands = new Set<string>();
@@ -182,7 +189,7 @@ export default function ProductListPage() {
                     />
                     {c.name}
                     <span className="text-xs text-navy-700/40">
-                      ({categoryCounts.get(c.name) ?? 0})
+                      ({categoryCounts.get(c.id) ?? 0})
                     </span>
                   </label>
                 ))}
